@@ -36,7 +36,7 @@ public class ShowPostsPresenter extends MvpBasePresenter<ShowPostsView>{
         MyApplication.getNetworkComponent().inject(this);
 
 
-        api.getData("bash", 50).enqueue(new Callback<List<PostModel>>() {
+        api.getData("bash", 100).enqueue(new Callback<List<PostModel>>() {
             @Override
             public void onResponse(Call<List<PostModel>> call, Response<List<PostModel>> response) {
                 Log.d("TAG", "body = " + response.body());
