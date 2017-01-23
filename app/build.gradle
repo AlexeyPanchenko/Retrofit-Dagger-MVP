@@ -1,16 +1,19 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 24
+    compileSdkVersion 25
     buildToolsVersion "25.0.1"
     defaultConfig {
         applicationId "com.example.easyretrofit"
         minSdkVersion 17
-        targetSdkVersion 24
+        targetSdkVersion 25
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+
     }
+
+
     buildTypes {
         release {
             minifyEnabled false
@@ -24,18 +27,19 @@ dependencies {
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    compile 'com.android.support:appcompat-v7:24.2.0'
+    compile 'com.android.support:appcompat-v7:25.0.1'
     testCompile 'junit:junit:4.12'
 
     //Retrofit 2
     compile 'com.squareup.retrofit2:retrofit:2.1.0'
     compile 'com.squareup.retrofit2:converter-gson:2.1.0' // конвертер для gson
+    compile 'com.squareup.retrofit2:adapter-rxjava:2.0.2' // адаптер для rx
 
     //Gson
     compile 'nl.littlerobots.cupboard-tools:gson:0.3.1'
 
     //Recyclerview
-    compile 'com.android.support:recyclerview-v7:24.2.0'
+    compile 'com.android.support:recyclerview-v7:25.0.1'
 
     // Dagger 2
     compile 'com.google.dagger:dagger:2.8'
@@ -48,4 +52,9 @@ dependencies {
     //Mosby
     compile 'com.hannesdorfmann.mosby:mvp:2.0.1'
     compile 'com.hannesdorfmann.mosby:viewstate:2.0.1'
+
+    //RxJava
+    compile 'io.reactivex:rxjava:1.2.3'
+    compile 'io.reactivex:rxandroid:1.2.1'
+
 }

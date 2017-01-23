@@ -13,16 +13,19 @@ import com.hannesdorfmann.mosby.mvp.MvpBasePresenter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.functions.Action1;
+import rx.subjects.BehaviorSubject;
 
 public class ShowPostsPresenter extends MvpBasePresenter<ShowPostsView>{
 
-    List<PostModel> posts = new ArrayList<>();
+    private List<PostModel> posts = new ArrayList<>();
+    private static Subscription sudscription;
 
     @Inject
     Api api;
@@ -31,23 +34,31 @@ public class ShowPostsPresenter extends MvpBasePresenter<ShowPostsView>{
         this.posts = posts;
     }
 
+    public void doUnsubscribe(){
+        if(sudscription != null && !sudscription.isUnsubscribed()){
+            sudscription.unsubscribe();
+            Log.d("TTT", "doUnsubscribe +++ ");
+        }
+
+    }
+
     public void getPosts(final List<PostModel> posts, final Context context){
 
         MyApplication.getNetworkComponent().inject(this);
 
-
-        api.getData("bash", 100).enqueue(new Callback<List<PostModel>>() {
-            @Override
-            public void onResponse(Call<List<PostModel>> call, Response<List<PostModel>> response) {
-                Log.d("TAG", "body = " + response.body());
-                posts.addAll(response.body());
-                getView().showPosts();
-            }
-
-            @Override
-            public void onFailure(Call<List<PostModel>> call, Throwable t) {
-                Toast.makeText(context, "An error occurred during networking", Toast.LENGTH_SHORT).show();
-            }
-        });
+        sudscription = api.getData("bash", 100)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Action1<List<PostModel>>() {
+                    @Override
+                    public void call(List<PostModel> postModels) {
+                        posts.addAll(postModels);
+                        getView().showPosts();
+                    }
+                }, new Action1<Throwable>() {
+                    @Override
+                    public void call(Throwable throwable) {
+                        Toast.makeText(context, "An error occurred during networking", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

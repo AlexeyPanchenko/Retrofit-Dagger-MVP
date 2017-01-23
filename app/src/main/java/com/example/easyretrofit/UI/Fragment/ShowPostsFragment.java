@@ -2,11 +2,14 @@ package com.example.easyretrofit.UI.Fragment;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import com.example.easyretrofit.Presenter.ShowPostsPresenter;
 import com.example.easyretrofit.R;
@@ -27,6 +30,9 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
     @BindView(R.id.posts_recycle_view)
     RecyclerView recyclerView;
 
+    @BindView(R.id.fragment)
+    SwipeRefreshLayout layout;
+
     List<PostModel> posts;
 
     PostsAdapter postsAdapter;
@@ -44,6 +50,16 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
 
         postsAdapter = new PostsAdapter(posts);
         recyclerView.setAdapter(postsAdapter);
+
+        layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                layout.setRefreshing(true);
+                presenter.getPosts(posts, getActivity());
+                layout.setRefreshing(false);
+            }
+        });
+
 
         return view;
     }
@@ -63,4 +79,11 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
     public ShowPostsPresenter createPresenter() {
         return new ShowPostsPresenter(posts);
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        presenter.doUnsubscribe();
+    }
+
 }
