@@ -1,6 +1,8 @@
 package com.example.easyretrofit.UI.Fragment;
 
+import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
@@ -25,7 +27,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPresenter> implements ShowPostsView {
+public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPresenter> implements ShowPostsView, SwipeRefreshLayout.OnRefreshListener {
 
     @BindView(R.id.posts_recycle_view)
     RecyclerView recyclerView;
@@ -36,6 +38,7 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
     List<PostModel> posts;
 
     PostsAdapter postsAdapter;
+    RecyclerView.ViewHolder holder;
 
     @Nullable
     @Override
@@ -51,14 +54,9 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
         postsAdapter = new PostsAdapter(posts);
         recyclerView.setAdapter(postsAdapter);
 
-        layout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                layout.setRefreshing(true);
-                presenter.getPosts(posts, getActivity());
-                layout.setRefreshing(false);
-            }
-        });
+        layout.setColorSchemeColors(Color.RED, Color.GREEN, Color.BLUE);
+
+        layout.setOnRefreshListener(this);
 
 
         return view;
@@ -68,6 +66,13 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         presenter.getPosts(posts, getActivity());
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d("TTT", "Unsubscribe = " + presenter.getSudscription().isUnsubscribed());
     }
 
     @Override
@@ -81,9 +86,27 @@ public class ShowPostsFragment extends MvpFragment<ShowPostsView, ShowPostsPrese
     }
 
     @Override
-    public void onDestroy() {
-        super.onDestroy();
+    public void onPause() {
+        super.onPause();
         presenter.doUnsubscribe();
+        Log.d("TTT", "Unsubscribe = " + presenter.getSudscription().isUnsubscribed());
     }
 
+    @Override
+    public void onRefresh() {
+        layout.setRefreshing(true);
+        postsAdapter = new PostsAdapter(posts);
+        recyclerView.setAdapter(postsAdapter);
+        recyclerView.getAdapter().notifyDataSetChanged();
+        presenter.getPosts(posts, getActivity());
+
+        layout.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                layout.setRefreshing(false);
+
+            }
+        }, 1200);
+
+    }
 }

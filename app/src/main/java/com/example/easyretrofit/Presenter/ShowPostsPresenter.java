@@ -61,4 +61,8 @@ public class ShowPostsPresenter extends MvpBasePresenter<ShowPostsView>{
                     }
                 });
     }
+
+    public Subscription getSudscription(){
+        return sudscription;
+    }
 }
